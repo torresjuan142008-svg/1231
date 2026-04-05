@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estilo Elegante</title>
+
+<style>
+    body {
+        margin: 0;
+        background-color: black;
+        font-family: Arial, sans-serif;
+        color: white;
+        text-align: center;
+    }
+
+    .container {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        margin: auto;
+        margin-top: 50px;
+    }
+
+    img {
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    /* Texto tipo "versiculo 1" */
+    .texto {
+        position: absolute;
+        top: 40%;
+        left: 10px;
+        color: red;
+        font-size: 20px;
+    }
+
+    /* Cuadro rojo */
+    .cuadro-rojo {
+        position: absolute;
+        top: 45%;
+        left: 40%;
+        width: 100px;
+        height: 120px;
+        border: 4px solid red;
+        border-radius: 10px;
+    }
+
+    /* Cuadro negro */
+    .cuadro-negro {
+        position: absolute;
+        top: 45%;
+        right: 20px;
+        width: 100px;
+        height: 120px;
+        border: 4px solid white;
+        border-radius: 10px;
+    }
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+    <!-- Cambia la imagen por la tuya -->
+    <img src="pagina.png" alt="Imagen">
+
+    <div class="texto">versiculo 1</div>
+
+    <div class="cuadro-rojo"></div>
+    <div class="cuadro-negro"></div>
+</div>
+
+</body>
+</html>
