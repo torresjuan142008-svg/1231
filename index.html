@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Galaga del Amor 💖</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: linear-gradient(to bottom, #000014, #1a0033);
+        font-family: Arial, sans-serif;
+        color: white;
+        text-align: center;
+    }
+
+    canvas {
+        display: block;
+        margin: auto;
+        background: radial-gradient(circle, #120024, #000);
+        border: 3px solid pink;
+    }
+
+    #score {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 24px;
+        color: #ff99cc;
+        font-weight: bold;
+    }
+
+    #message {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.85);
+        padding: 30px;
+        border: 3px solid pink;
+        border-radius: 20px;
+        display: none;
+        z-index: 10;
+        max-width: 400px;
+    }
+
+    #message button {
+        margin-top: 20px;
+        padding: 12px 25px;
+        font-size: 20px;
+        background: hotpink;
+        border: none;
+        border-radius: 12px;
+        color: white;
+        cursor: pointer;
+    }
+
+    #message button:hover {
+        background: deeppink;
+    }
+</style>
+</head>
+<body>
+
+<div id="score">Puntos: 0</div>
+
+<div id="message">
+    <h2 id="messageText"></h2>
+    <button id="rewardButton">🎁 Abrir Premio</button>
+</div>
+
+<canvas id="gameCanvas" width="480" height="640"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+const scoreDiv = document.getElementById("score");
+const message = document.getElementById("message");
+const messageText = document.getElementById("messageText");
+const rewardButton = document.getElementById("rewardButton");
+
+let score = 0;
+let keys = {};
+let bullets = [];
+let enemies = [];
+let gameRunning = true;
+let reward500Shown = false;
+let reward1000Shown = false;
+
+const player = {
+    x: canvas.width / 2 - 20,
+    y: canvas.height - 60,
+    width: 40,
+    height: 40,
+    speed: 6
+};
+
+// Eventos teclado
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
+
+// Disparar
+document.addEventListener("keydown", e => {
+    if (e.key === " " && gameRunning) {
+        bullets.push({
+            x: player.x + 8,
+            y: player.y,
+            size: 20
+        });
+    }
+});
+
+// Dibujar texto
+function drawText(text, x, y, size = 24) {
+    ctx.font = size + "px Arial";
+    ctx.fillText(text, x, y);
+}
+
+// Dibujar jugador (nave)
+function drawPlayer() {
+    drawText("🚀", player.x, player.y + 30, 32);
+}
+
+// Dibujar corazones
+function drawBullets() {
+    bullets.forEach(b => {
+        drawText("💖", b.x, b.y, 20);
+    });
+}
+
+// Dibujar enemigos
+function drawEnemies() {
+    enemies.forEach(e => {
+        drawText("💙", e.x, e.y, 28);
+    });
+}
+
+// Crear enemigos
+function spawnEnemies() {
+    if (Math.random() < 0.03) {
+        enemies.push({
+            x: Math.random() * (canvas.width - 30),
+            y: -30,
+            size: 28,
+            speed: 2 + Math.random() * 2
+        });
+    }
+}
+
+// Actualizar balas
+function updateBullets() {
+    bullets.forEach(b => b.y -= 8);
+    bullets = bullets.filter(b => b.y > -20);
+}
+
+// Actualizar enemigos
+function updateEnemies() {
+    enemies.forEach(e => e.y += e.speed);
+    enemies = enemies.filter(e => e.y < canvas.height + 40);
+}
+
+// Colisiones
+function checkCollisions() {
+    bullets.forEach((b, bi) => {
+        enemies.forEach((e, ei) => {
+            if (
+                b.x < e.x + 20 &&
+                b.x + 20 > e.x &&
+                b.y < e.y + 20 &&
+                b.y + 20 > e.y
+            ) {
+                bullets.splice(bi, 1);
+                enemies.splice(ei, 1);
+                score += 50;
+                scoreDiv.textContent = "Puntos: " + score;
+            }
+        });
+    });
+}
+
+// Mostrar premio
+function showReward(text, rewardText) {
+    gameRunning = false;
+    message.style.display = "block";
+    messageText.textContent = text;
+    rewardButton.onclick = () => {
+        alert(rewardText);
+        message.style.display = "none";
+        gameRunning = true;
+        update();
+    };
+}
+
+// Actualizar juego
+function update() {
+    if (!gameRunning) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Movimiento
+    if (keys["ArrowLeft"] && player.x > 0)
+        player.x -= player.speed;
+    if (keys["ArrowRight"] && player.x < canvas.width - player.width)
+        player.x += player.speed;
+
+    // Actualizaciones
+    spawnEnemies();
+    updateBullets();
+    updateEnemies();
+    checkCollisions();
+
+    // Dibujar
+    drawPlayer();
+    drawBullets();
+    drawEnemies();
+
+    // Premio 500
+    if (score >= 500 && !reward500Shown) {
+        reward500Shown = true;
+        showReward(
+            "💝 ¡Ganaste un premio!",
+            "😘 Tu premio es un beso enorme."
+        );
+        return;
+    }
+
+    // Premio 1000
+    if (score >= 1000 && !reward1000Shown) {
+        reward1000Shown = true;
+        showReward(
+            "🎁 ¡Ganaste un regalo misterioso!",
+            "🎀 Tu regalo misterioso es una sorpresa especial llena de amor."
+        );
+        return;
+    }
+
+    requestAnimationFrame(update);
+}
+
+// Iniciar
+update();
+</script>
+
+</body>
+  </html>
